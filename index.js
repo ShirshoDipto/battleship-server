@@ -1,13 +1,14 @@
 require("dotenv").config();
 const http = require("http");
 const { Server } = require("socket.io");
+const axios = require("axios");
 
 const express = require("express");
 
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Home page");
+  res.send("Server is running...");
 });
 
 const server = http.createServer(app);
@@ -17,6 +18,17 @@ const PORT = process.env.PORT;
 server.listen(PORT, () => {
   console.log(`Server is listening on ${PORT}`);
 });
+
+setInterval(() => {
+  axios
+    .get(`${process.env.SERVER}`)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+}, 1000 * 60 * 10);
 
 const io = new Server(server, {
   cors: {
