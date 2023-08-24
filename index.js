@@ -20,14 +20,9 @@ server.listen(PORT, () => {
 });
 
 setInterval(() => {
-  axios
-    .get(`${process.env.SERVER}`)
-    .then(function (response) {
-      console.log(response.data);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  axios.get(`${process.env.SERVER}`).then(function (response) {
+    console.log(response.data);
+  });
 }, 1000 * 60 * 10);
 
 const io = new Server(server, {
