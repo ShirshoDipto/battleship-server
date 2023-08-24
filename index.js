@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("joinGame", ({ code, player, board }) => {
-    if (rooms.has(code)) {
+    if (rooms.has(code) && rooms.get(code).size < 2) {
       alterPlayerAndBoardData(code, player, board);
       socket.join(code);
       socket.to(code).emit("joined", { player, board });
