@@ -20,7 +20,7 @@ server.listen(PORT, () => {
 
 const io = new Server(server, {
   cors: {
-    origin: [process.env.CLIENT],
+    origin: [process.env.CLIENT_ORIGINAL, process.env.CLIENT_LOCAL],
   },
 });
 
