@@ -24,15 +24,70 @@ const io = new Server(server, {
   },
 });
 
-// io.use(async (socket, next) => {
-//   const user = socket.handshake.auth.user;
-//   if (!user) {
-//     return next(new Error("User must be provided."));
-//   }
+const rooms = io.sockets.adapter.rooms;
+const players = {};
 
-//   next();
-// });
+function generateCode() {
+  return Math.floor(Math.random() * 9000) + 1000;
+}
+
+function alterPlayerAndBoardData(code, player, board) {
+  player.roomId = code;
+  player.id = "opponent";
+  board.playerId = "opponent";
+}
 
 io.on("connection", (socket) => {
-  console.log("A player is connected. ");
+  console.log("A player has joined. ");
+
+  socket.on("createGame", ({ player, board }) => {
+    let code = generateCode();
+    while (rooms.has(code)) {
+      code = generateCode();
+    }
+
+    players[code] = { player, board };
+
+    socket.join(code);
+    socket.emit("created", code);
+  });
+
+  socket.on("joinGame", ({ code, player, board }) => {
+    if (rooms.has(code)) {
+      alterPlayerAndBoardData(code, player, board);
+      socket.join(code);
+      socket.to(code).emit("joined", { player, board });
+
+      const host = players[code];
+      alterPlayerAndBoardData(code, host.player, host.board);
+      socket.emit("receiveHostData", host);
+      delete players[code];
+    } else {
+      socket.emit("error", "Game with this code does not exist. ");
+    }
+  });
+
+  socket.on("leaveRoom", ({ roomId, isGameOver }) => {
+    if (roomId && rooms.has(roomId)) {
+      socket.leave(roomId);
+      if (!isGameOver) {
+        socket.to(roomId).emit("error", "Opponent has left the game. ");
+      }
+      if (players[roomId]) {
+        delete players[roomId];
+      }
+    }
+  });
+
+  socket.on("attack", ({ code, coord }) => {
+    if (rooms.has(code)) {
+      socket.to(code).emit("receiveAttack", coord);
+    } else {
+      socket.emit("error", "Opponent has left the game. ");
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("A player has left. ");
+  });
 });
