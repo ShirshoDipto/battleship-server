@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
 
   socket.on("leaveRoom", ({ roomId, isGameOver }) => {
     if (roomId && rooms.has(roomId)) {
-      socket.leave(roomId);
+      rooms.delete(roomId);
       if (!isGameOver) {
         socket.to(roomId).emit("error", "Opponent has left the game. ");
       }
