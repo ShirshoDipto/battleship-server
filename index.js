@@ -39,15 +39,15 @@ const io = new Server(server, {
 const rooms = io.sockets.adapter.rooms;
 const players = {};
 
-function generateCode() {
+const generateCode = () => {
   return Math.floor(Math.random() * 9000) + 1000;
-}
+};
 
-function alterPlayerAndBoardData(code, player, board) {
+const alterPlayerAndBoardData = (code, player, board) => {
   player.roomId = code;
   player.id = "opponent";
   board.playerId = "opponent";
-}
+};
 
 io.on("connection", (socket) => {
   console.log("A player has joined. ");
