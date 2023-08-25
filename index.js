@@ -81,13 +81,14 @@ io.on("connection", (socket) => {
 
   socket.on("leaveRoom", ({ roomId, isGameOver }) => {
     if (roomId && rooms.has(roomId)) {
+      if (!isGameOver) {
+        socket.to(roomId).emit("error", "Opponent has left the game. ");
+      }
+
       rooms.get(roomId).forEach((socketId) => {
         io.sockets.sockets.get(socketId).leave(roomId);
       });
 
-      if (!isGameOver) {
-        socket.to(roomId).emit("error", "Opponent has left the game. ");
-      }
       if (players[roomId]) {
         delete players[roomId];
       }
