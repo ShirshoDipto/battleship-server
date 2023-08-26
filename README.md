@@ -2,7 +2,7 @@
 
 This is the Socket.io server for handling multiplayer functionality.
 
-[Front-end repo](https://github.com/ShirshoDipto/battleship)
+[Front-end Repository](https://github.com/ShirshoDipto/battleship)
 
 ## Running Locally
 
